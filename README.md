@@ -68,7 +68,7 @@ To clone and run this application, you'll need the following installed on your c
    - [Install Docker Desktop on Linux](https://docs.docker.com/desktop/install/linux-install/)
 - [Python](https://www.python.org/downloads/)
 
-Install the cmj-bpd:
+Install bpd:
 ```bash
 # Clone this repository and install the code
 git clone https://github.com/JeanMaximilienCadic/bpd
