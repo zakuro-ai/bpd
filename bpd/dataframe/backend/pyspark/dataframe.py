@@ -332,15 +332,16 @@ class PySparkDataFrame(DataFrame):
         return self.withColumn(f"{c}_size", F.size(c))
 
     def self_sorted(self, c):
-        return self.withColumn(c, filtered_sorted_array_string(F.col(c), F.lit(c)))oVi
+        return self.withColumn(c, filtered_sorted_array_string(F.col(c), F.lit(c)))
 
     def add_top_k(self, c, k):
         for _k in range(k):
-            self = self.withColumn(
-                f"{c}_{k}", try_string_get_item(c, F.lit(k)))
+            self = self.withColumn(f"{c}_{k}", try_string_get_item(c, F.lit(k)))
         return self
 
     def split_date(self, c):
-        return self.withColumn(f"{c}_year", F.year(F.col(c)))\
-            .withColumn(f"{c}_month", F.month(F.col(c)))\
+        return (
+            self.withColumn(f"{c}_year", F.year(F.col(c)))
+            .withColumn(f"{c}_month", F.month(F.col(c)))
             .withColumn(f"{c}_day", F.dayofmonth(F.col(c)))
+        )

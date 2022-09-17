@@ -1,4 +1,4 @@
-__version__ = "1.0.12"
+__version__ = "1.0.13"
 
 _SPARK_ = "spark"
 _DASK_ = "dask"
@@ -9,6 +9,9 @@ _APP_NAME_ = "bpd"
 _DEFAULT_BACKEND_ = _SPARK_
 from pyspark.sql.functions import *
 from pyspark.sql.utils import AnalysisException
+from gnutools.fs import load_config, parent
+
+cfg = load_config(f"{parent(__file__)}/config.yml")
 
 
 def setmode(_backend):
@@ -99,14 +102,19 @@ def read_table(*args, timestamp=None, **kwargs):
     assert _DEFAULT_BACKEND_ in [_SPARK_]
     from bpd.backend import spark
     from bpd.dataframe import PySparkDataFrame
+
     if timestamp is None:
         return PySparkDataFrame(spark.read.table(*args, **kwargs))
     else:
-        return PySparkDataFrame(spark.read.option("timestampAsOf", timestamp).table(*args, **kwargs))
+        return PySparkDataFrame(
+            spark.read.option("timestampAsOf", timestamp).table(*args, **kwargs)
+        )
+
 
 def display(df, n=5, *args, **kwargs):
     try:
         import PythonShellImpl
+
         return PythonShellImpl.PythonShell.display(df._cdata)
     except:
         from IPython.display import display as Display
@@ -125,6 +133,7 @@ def read_delta(*args, **kwargs):
 
 def create_temp_views(L):
     import bpd
+
     missing_tables = list()
     for root, reader, db, t in L:
         if reader == bpd.read_csv:

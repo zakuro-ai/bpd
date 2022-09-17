@@ -16,6 +16,7 @@ setup(
         "bpd.dataframe.backend.dask",
         "bpd.dataframe.backend.pandas",
         "bpd.udf",
+        "bpd.tests",
     ],
     include_package_data=True,
     package_data={"": ["*.yml"]},

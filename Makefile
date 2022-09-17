@@ -1,5 +1,5 @@
 # PHONY are targets with no files to check, all in our case
-.DEFAULT_GOAL := help
+.DEFAULT_GOAL := build
 
 conf_file ?= .env
 -include $(conf_file)
@@ -111,7 +111,7 @@ slave:
 
 # COMMON
 tests:
-	docker run -i  $(IMAGE_SANDBOX) python -m $(PACKAGE).tests
+	python -m $(PACKAGE).tests
 
 # ALL
 all: build checkout
