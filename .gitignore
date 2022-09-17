@@ -1,0 +1,15 @@
+filestore
+dbfs
+#Common
+.idea
+.vscode
+*__data__*
+*__pycache__*
+*.pyc
+filestore*
+.ipynb_checkpoints
+dist/legacy
+dbfs
+etc
+# Uncommon
+cmj-bpd

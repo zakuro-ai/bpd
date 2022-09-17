@@ -1,0 +1,8 @@
+numpy
+pandas
+gnutools-python
+tqdm
+pyspark
+distributed
+jupyter
+jupyterlab
