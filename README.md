@@ -14,7 +14,6 @@
   <a href="#PythonEnv">PythonEnv</a> •
   <a href="#Databricks">Databricks</a> •
 
-[![Build Status](https://dev.azure.com/catalinamarketing/jp-placeholder/_apis/build/status/cmj-bpd?branchName=master)](https://dev.azure.com/catalinamarketing/jp-placeholder/_build/latest?definitionId=812&branchName=master)
 
 ## Code design
 * We recommend using Docker for dev and production. Therefore we encourage its usage all over the repo.
