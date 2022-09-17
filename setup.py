@@ -29,6 +29,6 @@ setup(
     platforms="linux_debian_10_x86_64",
     classifiers=[
         "Programming Language :: Python :: 3",
-        "License :: OSI Approved :: CMJ License",
+        "License :: OSI Approved :: MIT License",
     ],
 )

@@ -132,6 +132,18 @@ make build
 make docker_run_master
 ```
 
+# How to 
+```python
+import bpd
+from bpd import _SPARK_
+spark = bpd.setmode(_SPARK_)
+spark
+```
+Should return
+
+<a href="https://drive.google.com/uc?id=1IadQpNk2653aaflkXL-EBxJDWX43l0KP"><img src="https://drive.google.com/uc?id=1IadQpNk2653aaflkXL-EBxJDWX43l0KP" alt="IDGraph" width="200"></a>
+
+
 ## Ressources
 * Vanilla:  https://en.wikipedia.org/wiki/Vanilla_software
 * Sandbox: https://en.wikipedia.org/wiki/Sandbox_(software_development)
