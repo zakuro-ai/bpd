@@ -18,6 +18,8 @@ setup(
         "bpd.udf",
         "bpd.tests",
     ],
+    long_description="".join(open("README.md", "r").readlines()),
+    long_description_content_type="text/markdown",
     include_package_data=True,
     package_data={"": ["*.yml"]},
     url="https://github.com/JeanMaximilienCadic/bpd",
