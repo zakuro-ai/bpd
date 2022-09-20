@@ -6,7 +6,6 @@ setup(
     name="bpd",
     version=__version__,
     short_description="bpd",
-    long_description="bpd",
     packages=[
         "bpd",
         "bpd.backend",

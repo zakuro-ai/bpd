@@ -1,7 +1,7 @@
 import unittest
 import bpd
 from bpd import _SPARK_, cfg
-from bpd.dataframe import PySparkDataFrame as DataFrame
+from bpd.pyspark import PySparkDataFrame as DataFrame
 from gnutools.remote import download_and_unzip
 
 bpd.setmode(_SPARK_)

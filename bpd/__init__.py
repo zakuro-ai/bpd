@@ -1,17 +1,13 @@
-__version__ = "1.0.13"
-
-_SPARK_ = "spark"
-_DASK_ = "dask"
-_PANDAS_ = "pandas"
-_DASK_ENDPOINT_ = ""
-_APP_NAME_ = "bpd"
-
-_DEFAULT_BACKEND_ = _SPARK_
-from pyspark.sql.functions import *
-from pyspark.sql.utils import AnalysisException
 from gnutools.fs import load_config, parent
 
 cfg = load_config(f"{parent(__file__)}/config.yml")
+__version__ = "2.0.0"
+_SPARK_ = cfg.spark
+_DASK_ = cfg.dask
+_PANDAS_ = cfg.pandas
+_DASK_ENDPOINT_ = cfg.dask_endpoint
+_APP_NAME_ = cfg.project
+_DEFAULT_BACKEND_ = cfg.default_backend
 
 
 def setmode(_backend):

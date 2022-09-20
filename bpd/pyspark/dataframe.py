@@ -5,7 +5,8 @@ import logging
 from pyspark.sql import functions as F
 from pyspark.ml.feature import StringIndexer
 import pathlib
-from pyspark.sql.types import *
+from pyspark.sql.types import StructType
+from bpd.pyspark.udf import try_string_get_item
 
 
 class PySparkDataFrame(DataFrame):
@@ -331,8 +332,8 @@ class PySparkDataFrame(DataFrame):
     def add_array_size(self, c):
         return self.withColumn(f"{c}_size", F.size(c))
 
-    def self_sorted(self, c):
-        return self.withColumn(c, filtered_sorted_array_string(F.col(c), F.lit(c)))
+    # def self_sorted(self, c):
+    #     return self.withColumn(c, filtered_sorted_array_string(F.col(c), F.lit(c)))
 
     def add_top_k(self, c, k):
         for _k in range(k):
