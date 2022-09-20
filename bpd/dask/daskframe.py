@@ -138,5 +138,5 @@ class DaskFrame(DataFrame):
     def find(self, cond):
         return DaskFrame(self.loc[cond])
 
-    # def rebase(self, d, key):
-    #     d1 = self.find(~(self[key] == d.key))
+    def reset_index(self):
+        return DaskFrame(self.compute().reset_index())
