@@ -57,7 +57,7 @@ build_wheels: build_wheel
 install_requirements:
 	@pip install -r requirements.txt
 
-build_wheel:  install_requirements
+build_wheel:
 	# Build the wheels
 	@mv dist/$(PACKAGE)*.whl dist/legacy/ || true; \
 		python setup.py bdist_wheel

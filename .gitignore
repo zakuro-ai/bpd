@@ -1,3 +1,4 @@
+notebooks/*.csv
 filestore
 dbfs
 #Common
