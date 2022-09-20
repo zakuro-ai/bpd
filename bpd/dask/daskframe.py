@@ -51,7 +51,8 @@ class DaskFrame(DataFrame):
         except Exception:
             result = self._cdata.__getattribute__(name)
             if type(result) in [dd.DataFrame]:
-                return DaskFrame(result)
+                self._cdata = result
+                return self
             return result
 
     def __getattr__(self, name):
@@ -60,7 +61,8 @@ class DaskFrame(DataFrame):
         except Exception:
             result = self._cdata.__getattr__(name)
             if type(result) in [dd.DataFrame]:
-                return DaskFrame(result)
+                self._cdata = result
+                return self
             return result
 
     def display(self, *args, **kwargs):
@@ -70,6 +72,7 @@ class DaskFrame(DataFrame):
     def from_pandas(df, npartitions=8):
         return DaskFrame(df, npartitions=npartitions)
 
+    @staticmethod
     def from_records(records, npartitions=8):
         return DaskFrame(pd.DataFrame.from_records(records), npartitions=npartitions)
 
@@ -89,7 +92,7 @@ class DaskFrame(DataFrame):
         return self
 
     def withColumnRenamed(self, c0, c1):
-        return DaskFrame(self.withColumn(c1, F.col(c0)).drop(c0, axis=1))
+        return self.withColumn(c1, F.col(c0)).drop(c0, axis=1)
 
     def add_timestamp(self, idx=None):
         now = datetime.now()
@@ -100,24 +103,30 @@ class DaskFrame(DataFrame):
         return self
 
     def aggregate(self, col, *args, **kwargs):
-        return DaskFrame(self.groupby(col).agg(list).reset_index())
+        self._cdata = DaskFrame(self.groupby(col).agg(list))._cdata
+        return self
 
     def limit(self, n):
-        return DaskFrame(self.loc[0:n, :])
+        self._cdata = self._cdata.loc[0:n, :]
+        return self
 
-    def join(self, df, on, *args, **kwargs):
+    def join(self, df, *args, **kwargs):
         try:
-            return DaskFrame(self.merge(df._cdata, on=on, *args, **kwargs))
+            self._cdata = self._cdata.merge(df._cdata, *args, **kwargs)
         except Exception:
-            return self.join(DaskFrame(df), on=on, *args, **kwargs)
+            self._cdata = self._cdata.join(DaskFrame(df)._cdata, *args, **kwargs)
+        return self
 
     def drop_column(self, c):
-        return DaskFrame(self._cdata.drop(c._object, axis=1))
+        self._cdata = self._cdata.drop(c._object, axis=1)
+        return self
 
     def drop_columns(self, *cols):
-        if len(cols) > 1:
-            return self.drop_column(cols[0]).drop_columns(*cols[1:])
-        return self.drop_column(cols[0])
+        return (
+            self.drop_column(cols[0]).drop_columns(*cols[1:])
+            if len(cols) > 1
+            else self.drop_column(cols[0])
+        )
 
     def export(self, path, index=False, *args, **kwargs):
         self.compute().to_csv(path, index=index, *args, **kwargs)
@@ -126,17 +135,29 @@ class DaskFrame(DataFrame):
     #     def select(self, *cols):
     #         return DaskFrame(self._cdata[list(cols)])
     def select(self, *cols):
-        if len(cols) == 1:
-            return DaskFrame(self._cdata[cols[0]])
-        else:
-            return DaskFrame(self._cdata[list(cols)])
+        self._cdata = (
+            self._cdata[cols[0]] if len(cols) == 1 else self._cdata[list(cols)]
+        )
+        return self
 
     def to_list(self, *cols):
         cols = cols if len(cols) > 0 else self.columns
         return self.select(*cols).compute()._values
 
     def find(self, cond):
-        return DaskFrame(self.loc[cond])
+        self._cdata = self._cdata.loc[cond]
+        return self
 
-    def reset_index(self):
-        return DaskFrame(self.compute().reset_index())
+    def reset_index(self, *args, **kwargs):
+        self._cdata = self._cdata.reset_index(*args, **kwargs)
+        return self
+
+    def set_index(self, *args, **kwargs):
+        self._cdata = self._cdata.set_index(*args, **kwargs)
+        return self
+
+    def restore_index(self):
+        return self.reset_index(True).set_index("index")
+
+    def copy(self, *args, **kwargs):
+        return DaskFrame(self._cdata.copy())
