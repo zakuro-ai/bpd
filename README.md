@@ -13,7 +13,8 @@
   <a href="#installing-the-application">Installing the application</a> •
   <a href="#makefile-commands">Makefile commands</a> •
   <a href="#environments">Environments</a> •
-  <a href="#running-the-application">Running the application</a>
+  <a href="#running-the-application">Running the application</a>•
+  <a href="#notebook">Notebook</a>•
   <a href="#ressources">Ressources</a>
 </p>
 
@@ -161,6 +162,68 @@ Ran 1 test in 2.701s
 
 OK
 ```
+
+# Notebook
+```python
+from gnutools import fs
+from bpd.dask import DataFrame
+from bpd.dask import functions as F
+from gnutools.remote import gdrivezip
+```
+
+
+```python
+# Define a function to be applied to each row
+def word(f):
+    return fs.name(fs.parent(f))
+```
+
+
+```python
+# Import a sample dataset
+gdrivezip("gdrive://1y4gwaS7LjYUhwTex1-lNHJJ71nLEh3fE")
+df = DataFrame({"filename": fs.listfiles("/tmp/1y4gwaS7LjYUhwTex1-lNHJJ71nLEh3fE", [".wav"])})
+```
+
+
+```python
+# Chain transformations
+df = df\
+    .withColumn("name", F.apply(fs.name, F.col("filename")))\
+    .withColumn("word", F.apply(word, F.col("filename")))\
+    .set_index("word")
+```
+
+
+```python
+#Display the dataframe
+df.display()
+```
+
+
+```python
+# Define a function to be applied to a groupby
+def first(L):
+    return L[0]
+```
+
+
+```python
+# Join to the dataframe grouped by word. 
+# The aggregation with generate a list of files for each unique word.
+# Add a column `first` that will contain the result of the function first given the input of the filename column
+# Drop the colummn filename 
+# Join on word, right
+# Reset the index and display
+df.join(df\
+        .select(["filename"])\
+        .aggregate("word")\
+        .withColumn("first", F.apply(first, F.col("filename")))\
+        .drop_column(F.col("filename")), on="word", how="right"
+       )\
+.reset_index().display()
+```
+
 
 ## Ressources
 * Vanilla:  https://en.wikipedia.org/wiki/Vanilla_software
