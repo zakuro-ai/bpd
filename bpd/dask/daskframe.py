@@ -112,10 +112,9 @@ class DaskFrame(DataFrame):
 
     def join(self, df, *args, **kwargs):
         try:
-            self._cdata = self._cdata.merge(df._cdata, *args, **kwargs)
+            return DaskFrame(self.copy()._cdata.merge(df._cdata, *args, **kwargs))
         except Exception:
-            self._cdata = self._cdata.join(DaskFrame(df)._cdata, *args, **kwargs)
-        return self
+            return self.join(DaskFrame(df)._cdata, *args, **kwargs)
 
     def drop_column(self, c):
         self._cdata = self._cdata.drop(c._object, axis=1)
@@ -135,29 +134,51 @@ class DaskFrame(DataFrame):
     #     def select(self, *cols):
     #         return DaskFrame(self._cdata[list(cols)])
     def select(self, *cols):
-        self._cdata = (
-            self._cdata[cols[0]] if len(cols) == 1 else self._cdata[list(cols)]
+        return (
+            DaskFrame(self.copy()._cdata[cols[0]])
+            if len(cols) == 1
+            else DaskFrame(self.copy()._cdata[list(cols)])
         )
-        return self
 
     def to_list(self, *cols):
         cols = cols if len(cols) > 0 else self.columns
         return self.select(*cols).compute()._values
 
     def find(self, cond):
-        self._cdata = self._cdata.loc[cond]
-        return self
+        """_summary_
+
+        Args:
+            cond (_type_): Return a copy of the filter result. Doesnt affect cdata.
+
+        Returns:
+            _type_: _description_
+        """
+        return self.copy().filter(cond)
 
     def reset_index(self, *args, **kwargs):
-        self._cdata = self._cdata.reset_index(*args, **kwargs)
+        self._cdata = (
+            self._cdata.repartition(1)
+            .reset_index(*args, **kwargs)
+            .repartition(npartitions=self.npartitions)
+        )
+
         return self
 
     def set_index(self, *args, **kwargs):
         self._cdata = self._cdata.set_index(*args, **kwargs)
         return self
 
-    def restore_index(self):
-        return self.reset_index(True).set_index("index")
-
     def copy(self, *args, **kwargs):
         return DaskFrame(self._cdata.copy())
+
+    def filter(self, cond):
+        """_summary_
+
+        Args:
+            cond (_type_): Modify cdata immediately
+
+        Returns:
+            _type_: _description_
+        """
+        self._cdata = self._cdata.loc[cond]
+        return self
