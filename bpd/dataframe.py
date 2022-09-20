@@ -1,13 +1,13 @@
 import pyspark
 import pandas
 import dask
-from bpd.pyspark import PySparkDataFrame
-from bpd.dask import DaskDataFrame, DaskFrame
-from bpd.pandas import PandasDataFrame
+
 
 class DataFrame:
     def __init__(self, input, **config):
-        from bpd.dataframe import PySparkDataFrame, DaskDataFrame, PandasDataFrame
+        from bpd.pyspark import PySparkDataFrame
+        from bpd.dask import DaskDataFrame, DaskFrame
+        from bpd.pandas import PandasDataFrame
 
         # assert config.__contains__("backend")
         assert type(input) in [
