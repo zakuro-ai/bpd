@@ -28,18 +28,17 @@ setup(
     name="bpd",
     version=__version__,
     short_description="bpd",
-    long_description="bpd",
     packages=[
         "bpd",
-        "bpd.backend",
-        "bpd.dataframe",
-        "bpd.dataframe.backend",
-        "bpd.dataframe.backend.pyspark",
-        "bpd.dataframe.backend.dask",
-        "bpd.dataframe.backend.pandas",
-        "bpd.udf",
+        "bpd.dask",
+        "bpd.dask.types",
+        "bpd.pandas",
+        "bpd.pyspark",
+        "bpd.pyspark.udf",
         "bpd.tests",
     ],
+    long_description="".join(open("README.md", "r").readlines()),
+    long_description_content_type="text/markdown",
     include_package_data=True,
     package_data={"": ["*.yml"]},
     url="https://github.com/JeanMaximilienCadic/bpd",
@@ -55,6 +54,7 @@ setup(
         "License :: OSI Approved :: MIT License",
     ],
 )
+
 
 ```
 
@@ -123,14 +123,12 @@ make tests
 ```
 ```
 =1= TEST PASSED : bpd
-=1= TEST PASSED : bpd.backend
-=1= TEST PASSED : bpd.dataframe
-=1= TEST PASSED : bpd.dataframe.backend
-=1= TEST PASSED : bpd.dataframe.backend.dask
-=1= TEST PASSED : bpd.dataframe.backend.pandas
-=1= TEST PASSED : bpd.dataframe.backend.pyspark
+=1= TEST PASSED : bpd.dask
+=1= TEST PASSED : bpd.dask.types
+=1= TEST PASSED : bpd.pandas
+=1= TEST PASSED : bpd.pyspark
+=1= TEST PASSED : bpd.pyspark.udf
 =1= TEST PASSED : bpd.tests
-=1= TEST PASSED : bpd.udf
 +-----------+-------+-------------+-------------+-------+----+------------------------+---+-------+
 |Pregnancies|Glucose|BloodPressure|SkinThickness|Insulin| BMI|DiabetesPedigreeFunction|Age|Outcome|
 +-----------+-------+-------------+-------------+-------+----+------------------------+---+-------+
