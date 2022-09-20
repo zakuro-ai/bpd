@@ -15,11 +15,11 @@ def setmode(_backend):
     global _DEFAULT_BACKEND_
     _DEFAULT_BACKEND_ = _backend
     if _DEFAULT_BACKEND_ == _DASK_:
-        from bpd.backend import client
+        from bpd.dask.backend import client
 
         return client
     elif _DEFAULT_BACKEND_ == _SPARK_:
-        from bpd.backend import spark
+        from bpd.pyspark.backend import spark
 
         return spark
 

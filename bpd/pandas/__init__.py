@@ -1,1 +1,1 @@
-from bpd.dataframe.backend.pandas.dataframe import PandasDataFrame
+from .dataframe import PandasDataFrame

@@ -32,7 +32,7 @@ class PySparkDataFrame(DataFrame):
             assert config["spark"] is not None
         except Exception:
             try:
-                from bpd.backend import spark
+                from bpd.pyspark.backend import spark
 
                 self._spark = spark
             except Exception:

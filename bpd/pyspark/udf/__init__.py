@@ -1,8 +1,7 @@
 from datetime import datetime
 
 import pyspark.sql.functions as F
-from pyspark.sql.types import (ArrayType, DateType, DoubleType, IntegerType,
-                               StringType)
+from pyspark.sql.types import ArrayType, DateType, DoubleType, IntegerType, StringType
 
 
 @F.udf(StringType(), True)
