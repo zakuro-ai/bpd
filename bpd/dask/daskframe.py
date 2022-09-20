@@ -100,7 +100,7 @@ class DaskFrame(DataFrame):
         return self
 
     def aggregate(self, col, *args, **kwargs):
-        return DaskFrame(self.groupby(col).agg(list))
+        return DaskFrame(self.groupby(col).agg(list).reset_index())
 
     def limit(self, n):
         return DaskFrame(self.loc[0:n, :])
