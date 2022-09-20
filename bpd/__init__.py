@@ -1,4 +1,5 @@
 from gnutools.fs import load_config, parent
+from pyspark.sql.utils import AnalysisException
 
 cfg = load_config(f"{parent(__file__)}/config.yml")
 __version__ = "2.0.0"
