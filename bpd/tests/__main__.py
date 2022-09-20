@@ -1,8 +1,9 @@
 import os
+import unittest
+
+from bpd.tests import *
 from gnutools.fs import parent
 from gnutools.tests import test_imports
-from bpd.tests import *
-import unittest
 
 if __name__ == "__main__":
     # Test imports
