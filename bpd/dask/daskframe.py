@@ -223,6 +223,7 @@ class DaskFrame(DataFrame):
             pass
         # Groupby
         if group_on is not None:
+            select_cols = tuple([col for col in select_cols if not col == group_on])
             selfg = (
                 self.aggregate(group_on)
                 .reset_index(hard=False)
