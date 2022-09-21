@@ -2,7 +2,7 @@ from gnutools.fs import load_config, parent
 from pyspark.sql.utils import AnalysisException
 
 cfg = load_config(f"{parent(__file__)}/config.yml")
-__version__ = "2.0.1"
+__version__ = "2.0.2"
 _SPARK_ = cfg.spark
 _DASK_ = cfg.dask
 _PANDAS_ = cfg.pandas
