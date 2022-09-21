@@ -102,8 +102,12 @@ class DaskFrame(DataFrame):
             self._cdata[idx]["modified_on"] = lambda r: now
         return self
 
-    def aggregate(self, col, *args, **kwargs):
-        self._cdata = DaskFrame(self.groupby(col).agg(list))._cdata
+    def aggregate(self, col, *args, type_agg=None, **kwargs):
+        d0 = DaskFrame(self.groupby(col).agg(list))
+        if type_agg is not None:
+            for c in d0.columns:
+                d0 = d0.withColumn(c, F.apply(type_agg, F.col(c)))
+        self._cdata = d0._cdata
         return self
 
     def limit(self, n):
