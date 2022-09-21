@@ -1,33 +1,54 @@
 from bpd.dask import types
 
 
+def udf(dtype=None):
+    def map_dtype(dtype):
+        if dtype in [str, None]:
+            return "object"
+
+    def multipass(func):
+        def wrapper(*args, **kw):
+            return func, args, kw, map_dtype(dtype)
+
+        return wrapper
+
+    return multipass
+
+
+@udf()
+def top_k(f, k):
+    return f[:k]
+
+
+@udf()
+def last_k(f, k):
+    return f[-k:]
+
+
+@udf()
 def at_position(f, k):
     return f[k]
 
 
-def first(f, *args, **kwargs):
-    return at_position(f, k=0)
+@udf()
+def first(f):
+    return f[0]
 
 
-def last(f, *args, **kwargs):
-    return at_position(f, k=-1)
+@udf()
+def last(f):
+    return f[-1]
 
 
-def contains(f, value, *args, **kwargs):
+@udf()
+def contains(f, value):
     return f.__contains__(value)
 
 
-def identity(self, v, *args, **kwargs):
+@udf()
+def identity(v):
     return v
 
 
 def col(v, *args, **kwargs):
     return types.col(v)
-
-
-def lit(v, *args, **kwargs):
-    return types.lit(v)
-
-
-def apply(f, c, args=(), kwargs={}):
-    return types.apply(f, c, args=args, kwargs=kwargs)
