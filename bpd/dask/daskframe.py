@@ -79,7 +79,10 @@ class DaskFrame(DataFrame):
     def withColumn(self, col_name, mapf):
         if mapf.dtype == "apply":
             self._cdata[col_name] = lambda r: r[mapf._column._object].apply(
-                mapf._f, args=mapf._args, meta=(col_name, "object")
+                # mapf._f, args=mapf._args, kwargs=mapf._kwargs, meta=(col_name, "object")
+                mapf._f,
+                args=mapf._args,
+                **mapf._kwargs,
             )
         elif mapf.dtype == "lit":
             # "modified_on", F.lit(datetime.now()
@@ -102,11 +105,13 @@ class DaskFrame(DataFrame):
             self._cdata[idx]["modified_on"] = lambda r: now
         return self
 
-    def aggregate(self, col, *args, type_agg=None, **kwargs):
+    def aggregate(self, col, args=(), kwargs={}, type_agg=None):
         d0 = DaskFrame(self.groupby(col).agg(list))
         if type_agg is not None:
             for c in d0.columns:
-                d0 = d0.withColumn(c, F.apply(type_agg, F.col(c)))
+                d0 = d0.withColumn(
+                    c, F.apply(type_agg, F.col(c), args=args, kwargs=kwargs)
+                )
         self._cdata = d0._cdata
         return self
 

@@ -11,8 +11,9 @@ class lit(object):
 
 
 class apply(object):
-    def __init__(self, f, c, args):
+    def __init__(self, f, c, args, kwargs):
         self.dtype = "apply"
         self._f = f
         self._column = c
         self._args = args
+        self._kwargs = kwargs
