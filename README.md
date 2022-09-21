@@ -642,7 +642,7 @@ df.display()
 
 
 
-```python
+```markdown
 # Display the dataframe
 # Retrieve the first 3 filename per classe
 @udf
