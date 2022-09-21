@@ -52,3 +52,7 @@ def identity(v):
 
 def col(v, *args, **kwargs):
     return types.col(v)
+
+
+def lit(v, *args, **kwargs):
+    return types.lit(v)

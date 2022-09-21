@@ -93,15 +93,18 @@ class DaskFrame(DataFrame):
         return fun(*_args, **_kwargs)
 
     def withColumn(self, column, udf_fun):
-        fun, args, kwargs, dtype = udf_fun
         _self = self.copy()
-        _self._cdata[column] = lambda r: r.apply(
-            DaskFrame.apply_function,
-            args=(fun,) + args,
-            **kwargs,
-            meta=(column, dtype),
-            axis=1,
-        )
+        try:
+            _self._cdata[column] = udf_fun._object
+        except:
+            fun, args, kwargs, dtype = udf_fun
+            _self._cdata[column] = lambda r: r.apply(
+                DaskFrame.apply_function,
+                args=(fun,) + args,
+                **kwargs,
+                meta=(column, dtype),
+                axis=1,
+            )
         return _self
 
     def withColumnRenamed(self, c0, c1):
