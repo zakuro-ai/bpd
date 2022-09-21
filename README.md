@@ -720,7 +720,7 @@ df.display()
 
 
 
-```markdown
+```python
 # Display the dataframe
 # Retrieve the first 3 filename per classe
 @udf
@@ -730,7 +730,7 @@ def initial(classe):
 
 _df = df\
 .aggregate("classe")\
-.reset_index()\
+.reset_index(hard=False)\
 .withColumn("initial", initial(F.col("classe")))\
 .select(["classe", "initial"])\
 .set_index("classe")
@@ -884,7 +884,7 @@ _df.compute()
 
 
 ```python
-_df_initial = _df.reset_index().aggregate("initial")
+_df_initial = _df.reset_index(hard=False).aggregate("initial")
 _df_initial.compute()
 ```
 
