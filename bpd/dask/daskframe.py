@@ -248,3 +248,4 @@ class DaskFrame(DataFrame):
     def run_pipelines(self, pipelines):
         for pipeline in pipelines:
             self.run_pipeline(**pipeline)
+        return self
