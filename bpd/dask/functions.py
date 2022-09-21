@@ -1,4 +1,5 @@
 from bpd.dask import types
+import psutil
 
 
 def udf(dtype=None):
@@ -56,3 +57,16 @@ def col(v, *args, **kwargs):
 
 def lit(v, *args, **kwargs):
     return types.lit(v)
+
+
+def limit_mem(percentage=100):
+    def multipass(func):
+        def wrapper(*args, **kw):
+            if psutil.virtual_memory()[2] < percentage:
+                return func(*args, **kw)
+            else:
+                return float("nan")
+
+        return wrapper
+
+    return multipass
