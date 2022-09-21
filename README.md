@@ -166,16 +166,9 @@ OK
 # Notebook
 ```python
 from gnutools import fs
-from bpd.dask import DataFrame
+from bpd.dask import DataFrame, udf
 from bpd.dask import functions as F
 from gnutools.remote import gdrivezip
-```
-
-
-```python
-# Define a function to be applied to each row
-def word(f):
-    return fs.name(fs.parent(f))
 ```
 
 
@@ -183,46 +176,867 @@ def word(f):
 # Import a sample dataset
 gdrivezip("gdrive://1y4gwaS7LjYUhwTex1-lNHJJ71nLEh3fE")
 df = DataFrame({"filename": fs.listfiles("/tmp/1y4gwaS7LjYUhwTex1-lNHJJ71nLEh3fE", [".wav"])})
+df.compute()      
 ```
 
 
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>filename</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>/tmp/1y4gwaS7LjYUhwTex1-lNHJJ71nLEh3fE/wow/919...</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>/tmp/1y4gwaS7LjYUhwTex1-lNHJJ71nLEh3fE/wow/6a2...</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>/tmp/1y4gwaS7LjYUhwTex1-lNHJJ71nLEh3fE/wow/682...</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>/tmp/1y4gwaS7LjYUhwTex1-lNHJJ71nLEh3fE/wow/beb...</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>/tmp/1y4gwaS7LjYUhwTex1-lNHJJ71nLEh3fE/wow/d37...</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>145</th>
+      <td>/tmp/1y4gwaS7LjYUhwTex1-lNHJJ71nLEh3fE/left/6a...</td>
+    </tr>
+    <tr>
+      <th>146</th>
+      <td>/tmp/1y4gwaS7LjYUhwTex1-lNHJJ71nLEh3fE/left/e3...</td>
+    </tr>
+    <tr>
+      <th>147</th>
+      <td>/tmp/1y4gwaS7LjYUhwTex1-lNHJJ71nLEh3fE/left/68...</td>
+    </tr>
+    <tr>
+      <th>148</th>
+      <td>/tmp/1y4gwaS7LjYUhwTex1-lNHJJ71nLEh3fE/left/e7...</td>
+    </tr>
+    <tr>
+      <th>149</th>
+      <td>/tmp/1y4gwaS7LjYUhwTex1-lNHJJ71nLEh3fE/left/65...</td>
+    </tr>
+  </tbody>
+</table>
+<p>150 rows × 1 columns</p>
+</div>
+
+
+
+
 ```python
-# Chain transformations
+# Register a user-defined function
+@udf
+def word(f):
+    return fs.name(fs.parent(f))
+
+# Apply a udf function
+df\
+.withColumn("classe", word(F.col("filename")))\
+.compute()    
+```
+
+
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>filename</th>
+      <th>classe</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>/tmp/1y4gwaS7LjYUhwTex1-lNHJJ71nLEh3fE/wow/919...</td>
+      <td>wow</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>/tmp/1y4gwaS7LjYUhwTex1-lNHJJ71nLEh3fE/wow/6a2...</td>
+      <td>wow</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>/tmp/1y4gwaS7LjYUhwTex1-lNHJJ71nLEh3fE/wow/682...</td>
+      <td>wow</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>/tmp/1y4gwaS7LjYUhwTex1-lNHJJ71nLEh3fE/wow/beb...</td>
+      <td>wow</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>/tmp/1y4gwaS7LjYUhwTex1-lNHJJ71nLEh3fE/wow/d37...</td>
+      <td>wow</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>145</th>
+      <td>/tmp/1y4gwaS7LjYUhwTex1-lNHJJ71nLEh3fE/left/6a...</td>
+      <td>left</td>
+    </tr>
+    <tr>
+      <th>146</th>
+      <td>/tmp/1y4gwaS7LjYUhwTex1-lNHJJ71nLEh3fE/left/e3...</td>
+      <td>left</td>
+    </tr>
+    <tr>
+      <th>147</th>
+      <td>/tmp/1y4gwaS7LjYUhwTex1-lNHJJ71nLEh3fE/left/68...</td>
+      <td>left</td>
+    </tr>
+    <tr>
+      <th>148</th>
+      <td>/tmp/1y4gwaS7LjYUhwTex1-lNHJJ71nLEh3fE/left/e7...</td>
+      <td>left</td>
+    </tr>
+    <tr>
+      <th>149</th>
+      <td>/tmp/1y4gwaS7LjYUhwTex1-lNHJJ71nLEh3fE/left/65...</td>
+      <td>left</td>
+    </tr>
+  </tbody>
+</table>
+<p>150 rows × 2 columns</p>
+</div>
+
+
+
+
+```python
+# You can use inline udf functions
+df\
+.withColumn("name", udf(fs.name)(F.col("filename")))\
+.display()
+```
+
+
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>filename</th>
+      <th>name</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>/tmp/1y4gwaS7LjYUhwTex1-lNHJJ71nLEh3fE/wow/919...</td>
+      <td>919d3c0e_nohash_2</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>/tmp/1y4gwaS7LjYUhwTex1-lNHJJ71nLEh3fE/wow/6a2...</td>
+      <td>6a27a9bf_nohash_0</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>/tmp/1y4gwaS7LjYUhwTex1-lNHJJ71nLEh3fE/wow/682...</td>
+      <td>6823565f_nohash_2</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>/tmp/1y4gwaS7LjYUhwTex1-lNHJJ71nLEh3fE/wow/beb...</td>
+      <td>beb49c22_nohash_1</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>/tmp/1y4gwaS7LjYUhwTex1-lNHJJ71nLEh3fE/wow/d37...</td>
+      <td>d37e4bf1_nohash_0</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>145</th>
+      <td>/tmp/1y4gwaS7LjYUhwTex1-lNHJJ71nLEh3fE/left/6a...</td>
+      <td>6a27a9bf_nohash_0</td>
+    </tr>
+    <tr>
+      <th>146</th>
+      <td>/tmp/1y4gwaS7LjYUhwTex1-lNHJJ71nLEh3fE/left/e3...</td>
+      <td>e32ff49d_nohash_0</td>
+    </tr>
+    <tr>
+      <th>147</th>
+      <td>/tmp/1y4gwaS7LjYUhwTex1-lNHJJ71nLEh3fE/left/68...</td>
+      <td>6823565f_nohash_2</td>
+    </tr>
+    <tr>
+      <th>148</th>
+      <td>/tmp/1y4gwaS7LjYUhwTex1-lNHJJ71nLEh3fE/left/e7...</td>
+      <td>e77d88fc_nohash_0</td>
+    </tr>
+    <tr>
+      <th>149</th>
+      <td>/tmp/1y4gwaS7LjYUhwTex1-lNHJJ71nLEh3fE/left/65...</td>
+      <td>659b7fae_nohash_2</td>
+    </tr>
+  </tbody>
+</table>
+<p>150 rows × 2 columns</p>
+</div>
+
+
+
+
+```python
+# Retrieve the first 3 filename per classe
+df\
+.withColumn("classe", word(F.col("filename")))\
+.aggregate("classe")\
+.withColumn("filename", F.top_k(F.col("filename"), 3))\
+.explode("filename")\
+.compute()
+```
+
+
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>filename</th>
+    </tr>
+    <tr>
+      <th>classe</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>wow</th>
+      <td>/tmp/1y4gwaS7LjYUhwTex1-lNHJJ71nLEh3fE/wow/919...</td>
+    </tr>
+    <tr>
+      <th>wow</th>
+      <td>/tmp/1y4gwaS7LjYUhwTex1-lNHJJ71nLEh3fE/wow/6a2...</td>
+    </tr>
+    <tr>
+      <th>wow</th>
+      <td>/tmp/1y4gwaS7LjYUhwTex1-lNHJJ71nLEh3fE/wow/682...</td>
+    </tr>
+    <tr>
+      <th>nine</th>
+      <td>/tmp/1y4gwaS7LjYUhwTex1-lNHJJ71nLEh3fE/nine/0f...</td>
+    </tr>
+    <tr>
+      <th>nine</th>
+      <td>/tmp/1y4gwaS7LjYUhwTex1-lNHJJ71nLEh3fE/nine/6a...</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>yes</th>
+      <td>/tmp/1y4gwaS7LjYUhwTex1-lNHJJ71nLEh3fE/yes/0a9...</td>
+    </tr>
+    <tr>
+      <th>yes</th>
+      <td>/tmp/1y4gwaS7LjYUhwTex1-lNHJJ71nLEh3fE/yes/0a7...</td>
+    </tr>
+    <tr>
+      <th>left</th>
+      <td>/tmp/1y4gwaS7LjYUhwTex1-lNHJJ71nLEh3fE/left/6a...</td>
+    </tr>
+    <tr>
+      <th>left</th>
+      <td>/tmp/1y4gwaS7LjYUhwTex1-lNHJJ71nLEh3fE/left/e3...</td>
+    </tr>
+    <tr>
+      <th>left</th>
+      <td>/tmp/1y4gwaS7LjYUhwTex1-lNHJJ71nLEh3fE/left/68...</td>
+    </tr>
+  </tbody>
+</table>
+<p>90 rows × 1 columns</p>
+</div>
+
+
+
+
+```python
+# Add the classe column to the original dataframe
 df = df\
-    .withColumn("name", F.apply(fs.name, F.col("filename")))\
-    .withColumn("word", F.apply(word, F.col("filename")))\
-    .set_index("word")
-```
+.withColumn("classe", word(F.col("filename")))
 
-
-```python
-#Display the dataframe
+# Display the modified dataframe
 df.display()
 ```
 
 
-```python
-# Define a function to be applied to a groupby
-def first(L):
-    return L[0]
-```
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>filename</th>
+      <th>classe</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>/tmp/1y4gwaS7LjYUhwTex1-lNHJJ71nLEh3fE/wow/919...</td>
+      <td>wow</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>/tmp/1y4gwaS7LjYUhwTex1-lNHJJ71nLEh3fE/wow/6a2...</td>
+      <td>wow</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>/tmp/1y4gwaS7LjYUhwTex1-lNHJJ71nLEh3fE/wow/682...</td>
+      <td>wow</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>/tmp/1y4gwaS7LjYUhwTex1-lNHJJ71nLEh3fE/wow/beb...</td>
+      <td>wow</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>/tmp/1y4gwaS7LjYUhwTex1-lNHJJ71nLEh3fE/wow/d37...</td>
+      <td>wow</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>145</th>
+      <td>/tmp/1y4gwaS7LjYUhwTex1-lNHJJ71nLEh3fE/left/6a...</td>
+      <td>left</td>
+    </tr>
+    <tr>
+      <th>146</th>
+      <td>/tmp/1y4gwaS7LjYUhwTex1-lNHJJ71nLEh3fE/left/e3...</td>
+      <td>left</td>
+    </tr>
+    <tr>
+      <th>147</th>
+      <td>/tmp/1y4gwaS7LjYUhwTex1-lNHJJ71nLEh3fE/left/68...</td>
+      <td>left</td>
+    </tr>
+    <tr>
+      <th>148</th>
+      <td>/tmp/1y4gwaS7LjYUhwTex1-lNHJJ71nLEh3fE/left/e7...</td>
+      <td>left</td>
+    </tr>
+    <tr>
+      <th>149</th>
+      <td>/tmp/1y4gwaS7LjYUhwTex1-lNHJJ71nLEh3fE/left/65...</td>
+      <td>left</td>
+    </tr>
+  </tbody>
+</table>
+<p>150 rows × 2 columns</p>
+</div>
+
+
 
 
 ```python
-# Join to the dataframe grouped by word. 
-# The aggregation with generate a list of files for each unique word.
-# Add a column `first` that will contain the result of the function first given the input of the filename column
-# Drop the colummn filename 
-# Join on word, right
-# Reset the index and display
-df.join(df\
-        .select(["filename"])\
-        .aggregate("word")\
-        .withColumn("first", F.apply(first, F.col("filename")))\
-        .drop_column(F.col("filename")), on="word", how="right"
-       )\
-.reset_index().display()
+# Display the dataframe
+# Retrieve the first 3 filename per classe
+@udf
+def initial(classe):
+    return classe[0]
+    
+
+_df = df\
+.aggregate("classe")\
+.reset_index()\
+.withColumn("initial", initial(F.col("classe")))\
+.select(["classe", "initial"])\
+.set_index("classe")
+
+# Display the dataframe grouped by classe
+_df.compute()
+    
 ```
+
+
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>initial</th>
+    </tr>
+    <tr>
+      <th>classe</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>bed</th>
+      <td>b</td>
+    </tr>
+    <tr>
+      <th>bird</th>
+      <td>b</td>
+    </tr>
+    <tr>
+      <th>cat</th>
+      <td>c</td>
+    </tr>
+    <tr>
+      <th>dog</th>
+      <td>d</td>
+    </tr>
+    <tr>
+      <th>down</th>
+      <td>d</td>
+    </tr>
+    <tr>
+      <th>eight</th>
+      <td>e</td>
+    </tr>
+    <tr>
+      <th>five</th>
+      <td>f</td>
+    </tr>
+    <tr>
+      <th>four</th>
+      <td>f</td>
+    </tr>
+    <tr>
+      <th>go</th>
+      <td>g</td>
+    </tr>
+    <tr>
+      <th>happy</th>
+      <td>h</td>
+    </tr>
+    <tr>
+      <th>house</th>
+      <td>h</td>
+    </tr>
+    <tr>
+      <th>left</th>
+      <td>l</td>
+    </tr>
+    <tr>
+      <th>marvin</th>
+      <td>m</td>
+    </tr>
+    <tr>
+      <th>nine</th>
+      <td>n</td>
+    </tr>
+    <tr>
+      <th>no</th>
+      <td>n</td>
+    </tr>
+    <tr>
+      <th>off</th>
+      <td>o</td>
+    </tr>
+    <tr>
+      <th>on</th>
+      <td>o</td>
+    </tr>
+    <tr>
+      <th>one</th>
+      <td>o</td>
+    </tr>
+    <tr>
+      <th>right</th>
+      <td>r</td>
+    </tr>
+    <tr>
+      <th>seven</th>
+      <td>s</td>
+    </tr>
+    <tr>
+      <th>sheila</th>
+      <td>s</td>
+    </tr>
+    <tr>
+      <th>six</th>
+      <td>s</td>
+    </tr>
+    <tr>
+      <th>stop</th>
+      <td>s</td>
+    </tr>
+    <tr>
+      <th>three</th>
+      <td>t</td>
+    </tr>
+    <tr>
+      <th>tree</th>
+      <td>t</td>
+    </tr>
+    <tr>
+      <th>two</th>
+      <td>t</td>
+    </tr>
+    <tr>
+      <th>up</th>
+      <td>u</td>
+    </tr>
+    <tr>
+      <th>wow</th>
+      <td>w</td>
+    </tr>
+    <tr>
+      <th>yes</th>
+      <td>y</td>
+    </tr>
+    <tr>
+      <th>zero</th>
+      <td>z</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+
+```python
+_df_initial = _df.reset_index().aggregate("initial")
+_df_initial.compute()
+```
+
+
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>classe</th>
+    </tr>
+    <tr>
+      <th>initial</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>b</th>
+      <td>[bed, bird]</td>
+    </tr>
+    <tr>
+      <th>c</th>
+      <td>[cat]</td>
+    </tr>
+    <tr>
+      <th>d</th>
+      <td>[dog, down]</td>
+    </tr>
+    <tr>
+      <th>e</th>
+      <td>[eight]</td>
+    </tr>
+    <tr>
+      <th>f</th>
+      <td>[five, four]</td>
+    </tr>
+    <tr>
+      <th>g</th>
+      <td>[go]</td>
+    </tr>
+    <tr>
+      <th>h</th>
+      <td>[happy, house]</td>
+    </tr>
+    <tr>
+      <th>l</th>
+      <td>[left]</td>
+    </tr>
+    <tr>
+      <th>m</th>
+      <td>[marvin]</td>
+    </tr>
+    <tr>
+      <th>n</th>
+      <td>[nine, no]</td>
+    </tr>
+    <tr>
+      <th>o</th>
+      <td>[off, on, one]</td>
+    </tr>
+    <tr>
+      <th>r</th>
+      <td>[right]</td>
+    </tr>
+    <tr>
+      <th>s</th>
+      <td>[seven, sheila, six, stop]</td>
+    </tr>
+    <tr>
+      <th>t</th>
+      <td>[three, tree, two]</td>
+    </tr>
+    <tr>
+      <th>u</th>
+      <td>[up]</td>
+    </tr>
+    <tr>
+      <th>w</th>
+      <td>[wow]</td>
+    </tr>
+    <tr>
+      <th>y</th>
+      <td>[yes]</td>
+    </tr>
+    <tr>
+      <th>z</th>
+      <td>[zero]</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+
+```python
+# Join the dataframes
+df\
+.join(_df, on="classe").drop_column("classe")\
+.join(_df_initial, on="initial")\
+.display()
+```
+
+
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>filename</th>
+      <th>initial</th>
+      <th>classe</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>/tmp/1y4gwaS7LjYUhwTex1-lNHJJ71nLEh3fE/wow/919...</td>
+      <td>w</td>
+      <td>[wow]</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>/tmp/1y4gwaS7LjYUhwTex1-lNHJJ71nLEh3fE/wow/6a2...</td>
+      <td>w</td>
+      <td>[wow]</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>/tmp/1y4gwaS7LjYUhwTex1-lNHJJ71nLEh3fE/wow/682...</td>
+      <td>w</td>
+      <td>[wow]</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>/tmp/1y4gwaS7LjYUhwTex1-lNHJJ71nLEh3fE/wow/beb...</td>
+      <td>w</td>
+      <td>[wow]</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>/tmp/1y4gwaS7LjYUhwTex1-lNHJJ71nLEh3fE/wow/d37...</td>
+      <td>w</td>
+      <td>[wow]</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>13</th>
+      <td>/tmp/1y4gwaS7LjYUhwTex1-lNHJJ71nLEh3fE/left/6a...</td>
+      <td>l</td>
+      <td>[left]</td>
+    </tr>
+    <tr>
+      <th>14</th>
+      <td>/tmp/1y4gwaS7LjYUhwTex1-lNHJJ71nLEh3fE/left/e3...</td>
+      <td>l</td>
+      <td>[left]</td>
+    </tr>
+    <tr>
+      <th>15</th>
+      <td>/tmp/1y4gwaS7LjYUhwTex1-lNHJJ71nLEh3fE/left/68...</td>
+      <td>l</td>
+      <td>[left]</td>
+    </tr>
+    <tr>
+      <th>16</th>
+      <td>/tmp/1y4gwaS7LjYUhwTex1-lNHJJ71nLEh3fE/left/e7...</td>
+      <td>l</td>
+      <td>[left]</td>
+    </tr>
+    <tr>
+      <th>17</th>
+      <td>/tmp/1y4gwaS7LjYUhwTex1-lNHJJ71nLEh3fE/left/65...</td>
+      <td>l</td>
+      <td>[left]</td>
+    </tr>
+  </tbody>
+</table>
+<p>150 rows × 3 columns</p>
+</div>
+
 
 
 ## Ressources
