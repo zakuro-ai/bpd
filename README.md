@@ -15,6 +15,7 @@
   <a href="#environments">Environments</a> •
   <a href="#running-the-application">Running the application</a>•
   <a href="#notebook">Notebook</a>•
+  <a href="#pipeline">Pipeline</a>•
   <a href="#ressources">Ressources</a>
 </p>
 
@@ -164,6 +165,177 @@ OK
 ```
 
 # Notebook
+## Pipeline
+```python
+from gnutools import fs
+from gnutools.remote import gdrivezip
+from bpd import cfg
+from bpd.dask import DataFrame, udf
+from bpd.dask import functions as F
+from bpd.dask.pipelines import *
+```
+
+
+```python
+# Import a sample dataset
+df = DataFrame({"filename": fs.listfiles(gdrivezip(cfg.gdrive.google_mini)[0], [".wav"])})
+df.compute()      
+```
+
+
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>filename</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>/tmp/1y4gwaS7LjYUhwTex1-lNHJJ71nLEh3fE/wow/919...</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>/tmp/1y4gwaS7LjYUhwTex1-lNHJJ71nLEh3fE/wow/6a2...</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>/tmp/1y4gwaS7LjYUhwTex1-lNHJJ71nLEh3fE/wow/682...</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>/tmp/1y4gwaS7LjYUhwTex1-lNHJJ71nLEh3fE/wow/beb...</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>/tmp/1y4gwaS7LjYUhwTex1-lNHJJ71nLEh3fE/wow/d37...</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+
+```python
+# Register a user-defined function
+@udf
+def word(f):
+    return fs.name(fs.parent(f))
+
+@udf
+def initial(classe):
+    return classe[0]
+
+@udf
+def lists(classes):
+    return list(set(classes))
+    
+
+df.run_pipelines(
+    [
+        {
+            select_cols: ("filename",),
+            pipeline: (
+                ("classe", word(F.col("filename"))),
+                ("name", udf(fs.name)(F.col("filename"))),
+            ),
+        },
+        {
+            group_on: "classe",
+            select_cols: ("name", ),
+            pipeline: (
+                ("initial", initial(F.col("classe"))),
+            ),
+        },
+        {
+            group_on: "initial",
+            select_cols: ("classe", ),
+            pipeline: (
+                ("_initial", lists(F.col("classe"))),
+            ),
+        },
+    ]
+)\
+.withColumnRenamed("_initial", "initial")\
+.compute()
+```
+
+
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>filename</th>
+      <th>initial</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>/tmp/1y4gwaS7LjYUhwTex1-lNHJJ71nLEh3fE/wow/919...</td>
+      <td>[wow]</td>
+    </tr>
+    <tr>
+      <th>0</th>
+      <td>/tmp/1y4gwaS7LjYUhwTex1-lNHJJ71nLEh3fE/wow/6a2...</td>
+      <td>[wow]</td>
+    </tr>
+    <tr>
+      <th>0</th>
+      <td>/tmp/1y4gwaS7LjYUhwTex1-lNHJJ71nLEh3fE/wow/682...</td>
+      <td>[wow]</td>
+    </tr>
+    <tr>
+      <th>0</th>
+      <td>/tmp/1y4gwaS7LjYUhwTex1-lNHJJ71nLEh3fE/wow/beb...</td>
+      <td>[wow]</td>
+    </tr>
+    <tr>
+      <th>0</th>
+      <td>/tmp/1y4gwaS7LjYUhwTex1-lNHJJ71nLEh3fE/wow/d37...</td>
+      <td>[wow]</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+## Sequential calls
 ```python
 from gnutools import fs
 from bpd.dask import DataFrame, udf
