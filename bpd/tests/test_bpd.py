@@ -63,7 +63,7 @@ class TestBPD(unittest.TestCase):
 
         _df = (
             df.aggregate("classe")
-            .reset_index()
+            .reset_index(hard=False)
             .withColumn("initial", initial(F.col("classe")))
             .select(["classe", "initial"])
             .set_index("classe")
@@ -72,7 +72,7 @@ class TestBPD(unittest.TestCase):
         # Display the dataframe grouped by classe
         _df.compute()
 
-        _df_initial = _df.reset_index().aggregate("initial")
+        _df_initial = _df.reset_index(hard=False).aggregate("initial")
         _df_initial.compute()
 
         # Join the dataframes

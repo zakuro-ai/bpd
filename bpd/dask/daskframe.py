@@ -134,11 +134,13 @@ class DaskFrame(DataFrame):
     def join(self, df, *args, **kwargs):
         try:
             return DaskFrame(self.copy()._cdata.merge(df._cdata, *args, **kwargs))
+            # return DaskFrame(self._cdata.merge(df._cdata, *args, **kwargs))
         except Exception:
             return self.join(DaskFrame(df)._cdata, *args, **kwargs)
 
-    def drop_column(self, c):
-        self._cdata = self._cdata.drop(c, axis=1)
+    def drop_column(self, c=None):
+        if c is not None:
+            self._cdata = self._cdata.drop(c, axis=1)
         return self
 
     def drop_columns(self, *cols):
@@ -176,10 +178,16 @@ class DaskFrame(DataFrame):
         """
         return self.copy().filter(cond)
 
-    def reset_index(self, *args, **kwargs):
-        _self = self.copy()
-        _self._cdata = _self._cdata.reset_index(*args, **kwargs)
-        return _self
+    def reset_index(self, hard=True, *args, **kwargs):
+        if hard:
+            self._cdata = (
+                self._cdata.repartition(1)
+                .reset_index(True)
+                .repartition(npartitions=self._npartitions)
+            )
+        else:
+            self._cdata = self._cdata.reset_index(*args, **kwargs)
+        return self
 
     def set_index(self, *args, **kwargs):
         _self = self.copy()
@@ -205,3 +213,37 @@ class DaskFrame(DataFrame):
         _self = self.copy()
         _self._cdata = _self._cdata.explode(*args, **kwargs)
         return _self
+
+    def run_pipeline(self, pipeline, group_on=None, select_cols=()):
+        # Remove the columns that will be generated in the pipeline
+        try:
+            for col, _ in pipeline:
+                self = self.drop_column(col)
+        except:
+            pass
+        # Groupby
+        if group_on is not None:
+            selfg = (
+                self.aggregate(group_on)
+                .reset_index(hard=False)
+                .select([group_on] + list(select_cols))
+            )
+
+            # Add sequential pipeline
+            for col, f in pipeline:
+                selfg = selfg.withColumn(col, f)
+
+            self._cdata = (
+                self.drop_columns(*select_cols)
+                .join(selfg.drop_columns(*select_cols), on=group_on)
+                ._cdata
+            )
+        else:
+            # Add sequential pipeline
+            for col, f in pipeline:
+                self._cdata = self.withColumn(col, f)._cdata
+        return self
+
+    def run_pipelines(self, pipelines):
+        for pipeline in pipelines:
+            self.run_pipeline(**pipeline)
