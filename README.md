@@ -73,7 +73,7 @@ To clone and run this application, you'll need the following installed on your c
 Install bpd:
 ```bash
 # Clone this repository and install the code
-git clone https://github.com/JeanMaximilienCadic/bpd
+git clone https://github.com/zakuro-ai/bpd
 
 # Go into the repository
 cd bpd
