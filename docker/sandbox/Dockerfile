@@ -1,4 +1,4 @@
-FROM cadic/bpd:vanilla
+FROM zakuroai/bpd:vanilla
 
 # Install the package
 COPY dist  /workspace/dist
