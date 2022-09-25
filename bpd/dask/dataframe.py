@@ -1,7 +1,7 @@
-from bpd.dataframe import DataFrame
-
 import dask
 from dask import dataframe as dd
+
+from bpd.dataframe import DataFrame
 
 
 class DaskDataFrame(DataFrame):

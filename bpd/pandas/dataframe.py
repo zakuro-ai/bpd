@@ -1,6 +1,8 @@
-from bpd.dataframe import DataFrame
 import logging
+
 import pandas as pd
+
+from bpd.dataframe import DataFrame
 
 
 class PandasDataFrame(DataFrame):
