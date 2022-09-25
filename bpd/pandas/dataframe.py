@@ -72,23 +72,3 @@ class PandasDataFrame(DataFrame):
                 return PandasDataFrame(result)
             return result
 
-
-if __name__ == "__main__":
-    path = "/tmp/sample_basket_20220124.csv"
-    df = PandasDataFrame(
-        path,
-        low_memory=False,
-        dtype={
-            "cnsmr_id_nbr": "object",
-            "cmp_external_id": "object",
-            "cmp_offer_name": "object",
-            "cmp_offer_source": "object",
-            "trigger_trade_item_cd_list": "object",
-        },
-    )
-
-    # df2 = df.where(df.touchpoint_key==7899100192)
-    # df2 = PySparkDataFrame(df.select("touchpoint_key", "trade_item_key").toPandas())
-    print(df.head())
-    print(len(df))
-    # print(df2.columns)

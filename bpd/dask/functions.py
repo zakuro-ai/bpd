@@ -1,5 +1,6 @@
-from bpd.dask import types
 import psutil
+
+from bpd.dask import types
 
 
 def udf(dtype=None):
