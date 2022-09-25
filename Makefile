@@ -9,10 +9,6 @@ $(conf_file):
 	$(error Please create a '$(conf_file)' file first, for example by copying example_conf.env. No '$(conf_file)' found)
 
 
-IMAGE_SANDBOX=$(ORG)/$(PACKAGE):sandbox
-IMAGE_VANILLA=$(ORG)/$(PACKAGE):vanilla
-SRV=/srv
-FILESTORE=/FileStore
 VERSION=$(shell python -c 'from $(PACKAGE) import __version__;print(__version__)')
 
 # Makefile for launching common tasks
