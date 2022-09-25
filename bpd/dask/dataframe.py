@@ -70,17 +70,3 @@ class DaskDataFrame(DataFrame):
         return self.head(*args, **kwargs)
 
 
-if __name__ == "__main__":
-    path = "/dbfs/FileStore/cmj-recsys/landing/sample_basket_20220124.csv"
-
-    bdf = DaskDataFrame(
-        path,
-        low_memory=False,
-        dtype={
-            "cnsmr_id_nbr": "object",
-            "cmp_external_id": "object",
-            "cmp_offer_name": "object",
-            "cmp_offer_source": "object",
-            "trigger_trade_item_cd_list": "object",
-        },
-    )
