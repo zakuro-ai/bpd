@@ -66,8 +66,12 @@ class DaskFrame(DataFrame):
             return result
 
     def display(self, *args, **kwargs):
-        return self._cdata.compute(*args, **kwargs)
-
+        return self.collect().compute(*args, **kwargs)
+    
+    def collect(self):
+        self._cdata = DaskFrame(self._cdata.compute(*args, **kwargs))
+        return self
+    
     @staticmethod
     def from_pandas(df, npartitions=8):
         return DaskFrame(df, npartitions=npartitions)
