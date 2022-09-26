@@ -68,7 +68,7 @@ class DaskFrame(DataFrame):
     def display(self, *args, **kwargs):
         return self.collect().compute(*args, **kwargs)
     
-    def collect(self):
+    def collect(self, *args, **kwargs):
         self._cdata = DaskFrame(self._cdata.compute(*args, **kwargs))
         return self
     
@@ -239,8 +239,7 @@ class DaskFrame(DataFrame):
                 selfg = selfg.withColumn(col, f)
 
             self._cdata = (
-                self.drop_columns(*select_cols)
-                .join(selfg.drop_columns(*select_cols), on=group_on)
+                self.join(selfg.drop_columns(*select_cols), on=group_on)
                 ._cdata
             )
         else:
